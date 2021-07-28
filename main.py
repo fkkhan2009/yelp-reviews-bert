@@ -18,7 +18,7 @@ def reviews_preprocessing(file_path):
     return data
 
 
-def bert_data_pipeline(data, label_list, max_seq_length=128):
+def bert_data_pipeline(data, label_list, max_seq_length,tokenizer):
     """
 
     :param data: a dict containing the training and validation data,
@@ -49,7 +49,7 @@ def bert_data_pipeline(data, label_list, max_seq_length=128):
     return (train_data, val_data)
 
 
-def to_feature(text, label, label_list=label_list, max_seq_length=max_seq_length, tokenizer=tokenizer):
+def to_feature(text, label, label_list, max_seq_length, tokenizer):
     """
 
     :param text:
@@ -144,7 +144,6 @@ if __name__ == '__main__':
     label_list = [1, 2, 3, 4, 5]
     max_seq_length = 128
     batch_size = 64
-    (train_data, val_data) = bert_data_pipeline(reviews_data, label_list, max_seq_length)
 
     # Get BERT layer and tokenizer:
     # More details here: https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/2
@@ -155,6 +154,8 @@ if __name__ == '__main__':
 
     tokenizer = tokenization.FullTokenizer(vocab_file, do_lower_case)
 
+    (train_data, val_data) = bert_data_pipeline(reviews_data, label_list, max_seq_length,tokenizer)
+
     model = create_model(bert_layer)
     model.compile(tf.keras.optimizers.Adam(learning_rate=2e-5),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(),
@@ -162,4 +163,29 @@ if __name__ == '__main__':
                   metrics=[
                       tf.keras.metrics.SparseCategoricalAccuracy()])  # SparseCategoricalAccuracy if the labels weren't in ohe
     print(model.summary())
+
+    # fine tuning the model
+
+    epochs = 4
+    history = model.fit(train_data,
+                        validation_data=val_data,
+                        epochs=epochs)
+
+
+    model.save(os.path.join(os.path.realpath(os.path.dirname(__file__)), "mysavedmodel.h5"))
+
+    # testing the model on some random text reviews
+    sample_reviews = ['the food was great.The drinks were fantastic. would recommend this place to my friends',
+                      'Food was okay.An average place to be honest']
+    test_data = tf.data.Dataset.from_tensor_slices((sample_reviews, [1] * len(sample_reviews)))
+    test_data = (test_data.map(to_feature_map).batch(1))  # no shuffle or prefetch
+    preds = model3.predict(
+        test_data)  # model.predict_classes is only available for Sequential models and not for Model class
+    for pred, review in zip(preds, sample_reviews):
+        pred = list(pred)
+        print('Review:', review, '\tThe rating is :', pred.index(max(pred)) + 1)
+
+
+
+
 
