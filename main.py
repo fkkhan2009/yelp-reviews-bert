@@ -135,7 +135,7 @@ if __name__ == '__main__':
     from sklearn.model_selection import train_test_split
 
     sys.path.append(os.path.dirname(__file__))
-    file_path = os.path.join(os.path.dirname(__file__), "yelp_academic_dataset_review.json")
+    file_path = os.path.join(os.path.realpath(os.path.dirname(__file__)), "yelp_academic_dataset_review.json")
     reviews_data = reviews_preprocessing(file_path)
 
     # convert the text and validation data to a form suitable for feeding into a BERT model
