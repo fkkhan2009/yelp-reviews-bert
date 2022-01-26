@@ -12,7 +12,9 @@ def preprocess_data(text, tokenizer):
 if __name__== '__main__':
     from transformers import BertTokenizer
     import tensorflow as tf
+    #add tokenizer path here
     bert_tokenizer_path = "/Users/kakhan/Desktop/saved models/BERT"
+    #add model path here
     model_path = "/Users/kakhan/Desktop/saved models/bert_yelp_model"
     print('Loading tokenizer...')
     tokenizer = BertTokenizer.from_pretrained(bert_tokenizer_path)
