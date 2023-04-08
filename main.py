@@ -129,9 +129,8 @@ if __name__ == '__main__':
 
     # clone the tensorflow models garden
     sys.path.append('models')  # this step is required to use the next step
-    from official.nlp.data import classifier_data_lib  # models/official
-    from official.nlp.bert import tokenization
-    from official.nlp import optimization
+    import official.nlp.data.classifier_data_lib  as classifier_data_lib # models/official
+    import official.nlp.bert.tokenization as tokenization
     from sklearn.model_selection import train_test_split
 
     sys.path.append(os.path.dirname(__file__))
@@ -179,7 +178,7 @@ if __name__ == '__main__':
                       'Food was okay.An average place to be honest']
     test_data = tf.data.Dataset.from_tensor_slices((sample_reviews, [1] * len(sample_reviews)))
     test_data = (test_data.map(to_feature_map).batch(1))  # no shuffle or prefetch
-    preds = model3.predict(
+    preds = model.predict(
         test_data)  # model.predict_classes is only available for Sequential models and not for Model class
     for pred, review in zip(preds, sample_reviews):
         pred = list(pred)
